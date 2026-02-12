@@ -86,11 +86,11 @@
       font-size: 14px;
     }
     
-    #fullscreenImageModal {
+    #fullscreenImageModal, #videoModal {
       z-index: 9999;
     }
     
-    .fullscreen-image-container {
+    .fullscreen-image-container, .video-container {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -102,6 +102,12 @@
       max-width: 95vw;
       max-height: 95vh;
       object-fit: contain;
+      border-radius: 8px;
+    }
+    
+    .video-container iframe {
+      max-width: 95vw;
+      max-height: 95vh;
       border-radius: 8px;
     }
   </style>
@@ -195,22 +201,33 @@
         <div id="resultMessage" class="text-xs sm:text-sm leading-relaxed p-3 sm:p-4 rounded-xl"></div>
        </div>
       </div>
-     </div><!-- Evidence Info -->
+     </div><!-- Evidence Info with Video -->
      <div class="animate-fade-in-up" style="animation-delay: 0.5s;">
       <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 sm:p-4">
-       <div class="flex items-start gap-2 sm:gap-3">
+       <div class="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
          </svg>
         </div>
         <div class="min-w-0">
-         <p class="font-semibold text-amber-800 mb-1 text-sm sm:text-base">💡 เกร็ดความรู้ทางการแพทย์</p>
-         <ul class="text-xs sm:text-sm text-amber-700 space-y-1 sm:space-y-2">
-          <li><strong>ทำไมต้อง 10%?</strong> ตามแนวทาง KDOQI หากค่าเกิน 10% ถือว่าผิดปกติ ควรตรวจเพิ่มเติม</li>
-          <li><strong>ทำไมต้องรอ 10 วินาที?</strong> เพื่อเคลียร์ Dead space ให้มั่นใจว่าเป็นเลือดจากผู้ป่วยจริง</li>
-         </ul>
+         <p class="font-semibold text-amber-800 text-sm sm:text-base">💡 เกร็ดความรู้ทางการแพทย์</p>
         </div>
        </div>
+       <ul class="text-xs sm:text-sm text-amber-700 space-y-1 sm:space-y-2 mb-4 sm:mb-5 ml-8 sm:ml-12">
+        <li><strong>ทำไมต้อง 10%?</strong> ตามแนวทาง KDOQI หากค่าเกิน 10% ถือว่าผิดปกติ ควรตรวจเพิ่มเติม</li>
+        <li><strong>ทำไมต้องรอ 10 วินาที?</strong> เพื่อเคลียร์ Dead space ให้มั่นใจว่าเป็นเลือดจากผู้ป่วยจริง</li>
+       </ul><!-- Video Player -->
+       <div class="rounded-lg overflow-hidden shadow-md border-2 border-amber-200 bg-black"><button id="openVideoBtn" class="w-full h-auto relative bg-black group">
+         <div class="aspect-video w-full bg-black flex items-center justify-center relative overflow-hidden"><img src="https://img.youtube.com/vi/nVP1_b2GuBI/maxresdefault.jpg" alt="YouTube Video Thumbnail" class="w-full h-full object-cover group-hover:opacity-80 transition-opacity" loading="lazy" onerror="this.style.background='#1a1a1a'; this.alt='Video thumbnail unavailable';">
+          <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+           <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white fill-current ml-1" viewbox="0 0 24 24"><path d="M8 5v14l11-7z" />
+            </svg>
+           </div>
+          </div>
+         </div></button>
+       </div>
+       <p class="text-xs text-amber-600 mt-2 text-center">🎥 คลิกเพื่อดูวิดีโอการสอนเพิ่มเติม</p>
       </div>
      </div>
     </div>
@@ -232,6 +249,15 @@
      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
      </svg></button>
     <div class="fullscreen-image-container"><img src="https://lh3.googleusercontent.com/d/1yoZISOQSsws-MuWOTiVX27yNsgVDkTgj" alt="Access Recirculation Setup - Fullscreen" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='rgba(0,77,64,0.3)'; this.alt='Image unavailable';">
+    </div>
+   </div>
+  </div><!-- Video Modal -->
+  <div id="videoModal" class="fixed inset-0 hidden">
+   <div class="modal-backdrop absolute inset-0" id="videoBackdrop"></div>
+   <div class="relative w-full h-full flex items-center justify-center p-3 sm:p-4"><button id="closeVideoBtn" class="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+     </svg></button>
+    <div class="video-container"><iframe width="100%" height="100%" style="max-width: 90vw; max-height: 90vh; border-radius: 8px;" src="https://www.youtube.com/embed/nVP1_b2GuBI?si=XNYeDfm-ywGLJn-x" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
    </div>
   </div><!-- Instructions Modal -->
@@ -359,6 +385,12 @@
     const closeImageBtn = document.getElementById('closeImageBtn');
     const fullscreenBackdrop = document.getElementById('fullscreenBackdrop');
     
+    // Video Modal elements
+    const videoModal = document.getElementById('videoModal');
+    const openVideoBtn = document.getElementById('openVideoBtn');
+    const closeVideoBtn = document.getElementById('closeVideoBtn');
+    const videoBackdrop = document.getElementById('videoBackdrop');
+    
     // Form elements
     const calculatorForm = document.getElementById('calculatorForm');
     const resultSection = document.getElementById('resultSection');
@@ -384,18 +416,6 @@
     closeModalBtn2.addEventListener('click', closeModal);
     modalBackdrop.addEventListener('click', closeModal);
     
-    // Close modal on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (!modal.classList.contains('hidden')) {
-          closeModal();
-        }
-        if (!fullscreenImageModal.classList.contains('hidden')) {
-          closeFullscreenImage();
-        }
-      }
-    });
-    
     // Image Modal functions
     function openFullscreenImage() {
       fullscreenImageModal.classList.remove('hidden');
@@ -410,6 +430,36 @@
     imageGalleryBtn.addEventListener('click', openFullscreenImage);
     closeImageBtn.addEventListener('click', closeFullscreenImage);
     fullscreenBackdrop.addEventListener('click', closeFullscreenImage);
+    
+    // Video Modal functions
+    function openVideoModal() {
+      videoModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeVideoModal() {
+      videoModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+    
+    openVideoBtn.addEventListener('click', openVideoModal);
+    closeVideoBtn.addEventListener('click', closeVideoModal);
+    videoBackdrop.addEventListener('click', closeVideoModal);
+    
+    // Close all modals on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (!modal.classList.contains('hidden')) {
+          closeModal();
+        }
+        if (!fullscreenImageModal.classList.contains('hidden')) {
+          closeFullscreenImage();
+        }
+        if (!videoModal.classList.contains('hidden')) {
+          closeVideoModal();
+        }
+      }
+    });
     
     // Calculator logic
     calculatorForm.addEventListener('submit', (e) => {
@@ -564,5 +614,5 @@
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cca3cf7f5c7d028',t:'MTc3MDg3OTkzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cca60ddc108d028',t:'MTc3MDg4MTQwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
